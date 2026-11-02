@@ -4,328 +4,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>J.A.R.V.I.S.</title>
-
+<title>JARVIS Interface</title>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#020911;color:#eafaff;
- font-family:Arial,sans-serif;overflow:hidden;
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+.stage{position:relative;width:100vw;height:100vh;overflow:hidden}
+.reference{
+ position:absolute;inset:0;width:100%;height:100%;
+ object-fit:fill;
 }
-button{cursor:pointer;color:#dffaff}
-.dashboard{
- width:100vw;height:100vh;min-height:360px;
- display:grid;
- grid-template-columns:145px 1.05fr 1.2fr 1.15fr;
- grid-template-rows:75px 1fr 145px;
- gap:10px;padding:12px;
- background:
- radial-gradient(ellipse at 48% 55%,#003b64 0%,transparent 42%),
- linear-gradient(135deg,#020811,#001525 55%,#00060c);
- position:relative;
+.hotspot{
+ position:absolute;z-index:3;border:0;
+ background:transparent;color:transparent;
+ cursor:pointer;padding:0;
 }
-.dashboard:before{
- content:"";position:absolute;inset:5px;
- border:1px solid #007ba9;border-radius:15px;
- box-shadow:inset 0 0 25px #003d63,0 0 15px #0077aa;
+.hotspot:focus-visible{
+ outline:2px solid #00eaff;
+ background:#00cfff22;
+}
+#clock{
+ position:absolute;z-index:4;right:3%;top:6%;
+ color:#dffaff;font: bold clamp(9px,1.1vw,16px) Arial;
+ text-shadow:0 0 8px #00bfff;pointer-events:none;
+}
+#status{
+ position:absolute;z-index:5;left:50%;bottom:2%;
+ transform:translateX(-50%);color:#00eaff;
+ font:12px Arial;text-shadow:0 0 8px #00bfff;
  pointer-events:none;
 }
-.header{
- grid-column:1/5;display:flex;align-items:center;
- justify-content:space-between;padding:0 12px;
- border-bottom:1px solid #006b9b;
-}
-.logo{font-size:clamp(22px,3vw,42px);font-weight:bold;
- letter-spacing:4px;color:#e8faff;text-shadow:0 0 15px #00bfff}
-.subtitle{color:#37dfff;font-size:12px}
-.status{font-size:13px;color:#bceeff;text-align:right}
-.sidebar{
- grid-column:1;grid-row:2/4;
- display:flex;flex-direction:column;gap:12px;
- padding:12px 4px;border:1px solid #0083b5;
- border-radius:12px;background:#001525aa;
-}
-.nav{
- border:1px solid transparent;background:transparent;
- padding:12px 8px;text-align:left;border-radius:9px;
- font-size:14px;
-}
-.nav.active,.nav:hover{
- background:linear-gradient(90deg,#007dbb,#00304c);
- border-color:#00caff;box-shadow:0 0 15px #007dbb;
-}
-.center{
- grid-column:2;grid-row:2/4;display:flex;
- flex-direction:column;align-items:center;justify-content:center;
- text-align:center;position:relative;min-width:0;
-}
-.greeting{color:#25dfff;font-size:clamp(16px,2vw,25px);
- font-weight:bold;margin-bottom:8px}
-.message{font-size:clamp(13px,1.5vw,19px);line-height:1.5}
-.core{
- width:min(31vw,340px);aspect-ratio:1;border-radius:50%;
- display:flex;align-items:center;justify-content:center;
- position:relative;margin:15px auto;
- background:radial-gradient(circle,#001b30 40%,#003a60 65%,#00101c 72%);
- box-shadow:0 0 25px #00aaff,inset 0 0 30px #00bfff;
-}
-.core:before,.core:after{
- content:"";position:absolute;inset:0;border-radius:50%;
- border:5px solid transparent;border-top-color:#00e5ff;
- border-bottom-color:#007cff;animation:spin 5s linear infinite;
-}
-.core:after{inset:13px;border-width:3px;
- border-left-color:#00d9ff;border-right-color:#007bff;
- animation:spin 3s linear infinite reverse}
-.core-inner{
- width:65%;height:65%;border:2px solid #00bfff;
- border-radius:50%;display:flex;align-items:center;
- justify-content:center;font-size:clamp(20px,3vw,38px);
- font-weight:bold;color:#e8fbff;
- text-shadow:0 0 15px #00cfff;
- box-shadow:0 0 25px #008cff,inset 0 0 25px #007bba;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.wave{color:#00dfff;letter-spacing:3px;
- font-size:clamp(12px,2vw,24px);animation:pulse 1s infinite alternate}
-@keyframes pulse{to{opacity:.3;text-shadow:0 0 20px #00dfff}}
-.right{
- grid-column:3/5;grid-row:2;display:grid;
- grid-template-columns:1fr 1.2fr;gap:10px;min-width:0;
-}
-.panel{
- border:1px solid #008cbd;border-radius:15px;
- background:linear-gradient(135deg,#061b2bde,#00101ddd);
- box-shadow:inset 0 0 15px #003b60,0 0 10px #003d60;
- padding:13px;min-width:0;
-}
-.weather{display:flex;align-items:center;justify-content:space-around}
-.weather-icon{font-size:48px}
-.temp{font-size:clamp(22px,3vw,38px);font-weight:bold}
-.small{font-size:12px;color:#a9d9ed;margin-top:5px}
-.stats{display:flex;flex-direction:column;justify-content:space-around}
-.stat{font-size:13px;margin:5px 0}
-.bar{height:9px;background:#123244;border-radius:8px;margin-top:5px;overflow:hidden}
-.fill{height:100%;width:var(--w);background:#00bfff;
- box-shadow:0 0 10px #00bfff;border-radius:8px}
-.actions{
- grid-column:3/5;grid-row:3;border:1px solid #008cbd;
- border-radius:15px;background:#00101cdd;padding:10px;
-}
-.action-title{font-size:18px;font-weight:bold;color:#bceeff;margin-bottom:8px}
-.action-list{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.action{
- min-width:0;min-height:85px;border:1px solid #006d9b;
- border-radius:13px;background:linear-gradient(#06253a,#00101b);
- display:flex;flex-direction:column;align-items:center;
- justify-content:center;gap:5px;font-size:13px;
-}
-.action:hover{border-color:#00dfff;box-shadow:0 0 15px #007dbb}
-.action .ico{font-size:27px;color:#00cfff}
-#output{font-size:12px;color:#5ce7ff;margin-top:8px;min-height:16px}
-@media(orientation:portrait){
- .dashboard{display:none}
+#mic.active{background:#00cfff33;outline:2px solid #00eaff}
+@media (orientation:portrait){
+ .stage{display:none}
  body:after{
- content:"PLEASE ROTATE YOUR PHONE TO LANDSCAPE";
- position:fixed;inset:0;display:flex;align-items:center;
- justify-content:center;text-align:center;padding:25px;
- color:#00dfff;font-size:20px;font-weight:bold;
- background:#020b14;
+ content:"ROTATE YOUR PHONE TO LANDSCAPE";
+ position:fixed;inset:0;display:grid;place-items:center;
+ color:#00eaff;font:bold 20px Arial;text-align:center;
+ background:#020811;
  }
-}
-@media(max-height:480px){
- .dashboard{grid-template-rows:55px 1fr 112px;padding:7px;gap:6px}
- .sidebar{gap:5px;padding:5px}
- .nav{padding:7px 5px;font-size:12px}
- .core{width:min(27vw,230px);margin:5px}
- .action{min-height:65px}
- .panel{padding:7px}
- .weather-icon{font-size:30px}
 }
 </style>
 </head>
-
 <body>
-<div class="dashboard">
+<div class="stage">
 
- <header class="header">
-  <div>
-   <div class="logo">J.A.R.V.I.S.</div>
-   <div class="subtitle">Just A Rather Very Intelligent System</div>
-  </div>
-  <div class="status">
-   <div>◉ Wi-Fi &nbsp; ◈ Bluetooth &nbsp; <span id="battery">Battery --</span></div>
-   <div id="date">Loading date...</div>
-   <div id="clock">--:--:--</div>
-  </div>
- </header>
+ <img class="reference" src="jarvis-reference.png"
+      alt="JARVIS interface">
 
- <aside class="sidebar">
-  <button class="nav active" onclick="say('Home screen')">⌂ &nbsp; Home</button>
-  <button class="nav" onclick="showApps()">▦ &nbsp; Apps</button>
-  <button class="nav" onclick="say('Files panel selected')">▰ &nbsp; Files</button>
-  <button class="nav" onclick="showSettings()">⚙ &nbsp; Settings</button>
-  <button class="nav" onclick="say('Power options selected')">⏻ &nbsp; Power</button>
- </aside>
+ <div id="clock">Loading...</div>
+ <div id="status">JARVIS SYSTEM ONLINE</div>
 
- <section class="center">
-  <div class="greeting" id="greeting">Good Evening, Sir...</div>
-  <div class="core">
-   <div class="core-inner">JARVIS</div>
-  </div>
-  <div class="message" id="message">How can I help you today?</div>
-  <div class="wave">〰 〰 〰 〰 〰</div>
-  <div id="output">SYSTEM ONLINE</div>
- </section>
+ <!-- LEFT MENU -->
+ <button class="hotspot" style="left:1%;top:28%;width:9%;height:14%"
+ onclick="say('Home screen activated')" aria-label="Home"></button>
 
- <section class="right">
-  <div class="panel weather">
-   <div>
-    <div class="weather-icon">🌙☁️</div>
-   </div>
-   <div>
-    <div class="temp">24°C</div>
-    <div>Partly Cloudy</div>
-    <div class="small">📍 Weather demo</div>
-   </div>
-  </div>
-  <div class="panel stats">
-   <div class="stat">CPU &nbsp; 18%
-    <div class="bar"><div class="fill" style="--w:18%"></div></div>
-   </div>
-   <div class="stat">RAM &nbsp; 42%
-    <div class="bar"><div class="fill" style="--w:42%"></div></div>
-   </div>
-   <div class="stat">GPU &nbsp; 12%
-    <div class="bar"><div class="fill" style="--w:12%"></div></div>
-   </div>
-   <div class="small">Illustrative system values</div>
-  </div>
- </section>
+ <button class="hotspot" style="left:1%;top:43%;width:9%;height:12%"
+ onclick="apps()" aria-label="Apps"></button>
 
- <section class="actions">
-  <div class="action-title">Quick Actions</div>
-  <div class="action-list">
-   <button class="action" onclick="listen()">
-    <span class="ico">🎙</span>Voice Assist
-   </button>
-   <button class="action" onclick="searchWeb()">
-    <span class="ico">⌕</span>Search
-   </button>
-   <button class="action" onclick="openMedia()">
-    <span class="ico">▶</span>Media
-   </button>
-   <button class="action" onclick="showSettings()">
-    <span class="ico">⚙</span>Settings
-   </button>
-   <button class="action" onclick="showApps()">
-    <span class="ico">▦</span>More
-   </button>
-  </div>
- </section>
+ <button class="hotspot" style="left:1%;top:56%;width:9%;height:12%"
+ onclick="say('Files panel selected')" aria-label="Files"></button>
+
+ <button class="hotspot" style="left:1%;top:69%;width:9%;height:12%"
+ onclick="settings()" aria-label="Settings"></button>
+
+ <button class="hotspot" style="left:1%;top:82%;width:9%;height:14%"
+ onclick="say('Power options selected')" aria-label="Power"></button>
+
+ <!-- QUICK ACTIONS -->
+ <button id="mic" class="hotspot"
+ style="left:60.5%;top:69%;width:7%;height:25%"
+ onclick="listen()" aria-label="Voice Assist"></button>
+
+ <button class="hotspot"
+ style="left:69%;top:69%;width:7%;height:25%"
+ onclick="search()" aria-label="Search"></button>
+
+ <button class="hotspot"
+ style="left:77%;top:69%;width:7%;height:25%"
+ onclick="media()" aria-label="Media"></button>
+
+ <button class="hotspot"
+ style="left:85%;top:69%;width:7%;height:25%"
+ onclick="settings()" aria-label="Settings"></button>
+
+ <button class="hotspot"
+ style="left:93%;top:69%;width:6.5%;height:25%"
+ onclick="apps()" aria-label="More"></button>
 
 </div>
 
 <script>
-const output=document.getElementById("output");
-const message=document.getElementById("message");
+const statusBox=document.getElementById("status");
+
+function status(text){
+ statusBox.textContent=text;
+}
 
 function say(text){
- output.textContent=text;
+ status(text);
  if("speechSynthesis" in window){
   speechSynthesis.cancel();
-  const voice=new SpeechSynthesisUtterance(text);
-  voice.lang="en-IN";
-  voice.rate=0.92;
-  voice.pitch=0.85;
-  speechSynthesis.speak(voice);
+  const speech=new SpeechSynthesisUtterance(text);
+  speech.lang="en-IN";
+  speech.rate=.9;
+  speech.pitch=.85;
+  speechSynthesis.speak(speech);
  }
 }
 
 function updateClock(){
- const now=new Date();
+ const d=new Date();
  document.getElementById("clock").textContent=
- now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
- document.getElementById("date").textContent=
- now.toLocaleDateString([], {weekday:"short",month:"short",day:"numeric",year:"numeric"});
- const h=now.getHours();
- document.getElementById("greeting").textContent=
- (h<12?"Good Morning":h<17?"Good Afternoon":"Good Evening")+", Sir...";
+ d.toLocaleDateString("en-IN",{weekday:"short",month:"short",
+ day:"numeric",year:"numeric"})+"  |  "+
+ d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
 }
 updateClock();
 setInterval(updateClock,1000);
 
-if(navigator.getBattery){
- navigator.getBattery().then(b=>{
-  function batteryUpdate(){
-   document.getElementById("battery").textContent=
-   "Battery "+Math.round(b.level*100)+"%";
-  }
-  batteryUpdate();
-  b.addEventListener("levelchange",batteryUpdate);
- }).catch(()=>{});
-}
-
 function listen(){
- const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SpeechRecognition){
-  output.textContent="Voice recognition not supported in this browser.";
+ const Recognition=window.SpeechRecognition||
+                   window.webkitSpeechRecognition;
+ if(!Recognition){
   say("Voice recognition is not supported in this browser.");
   return;
  }
- const recognition=new SpeechRecognition();
- recognition.lang="en-IN";
- recognition.onstart=()=>{output.textContent="Listening...";};
- recognition.onresult=(event)=>{
-  const command=event.results[0][0].transcript.toLowerCase();
-  output.textContent="You said: "+command;
-  message.textContent="You said: "+command;
-  processCommand(command);
+ const mic=document.getElementById("mic");
+ const rec=new Recognition();
+ rec.lang="en-IN";
+ rec.onstart=()=>{
+  mic.classList.add("active");
+  status("JARVIS IS LISTENING...");
  };
- recognition.onerror=()=>{output.textContent="Microphone error. Check permission.";};
- recognition.start();
+ rec.onend=()=>mic.classList.remove("active");
+ rec.onerror=()=>{
+  status("Microphone error. Check browser permission.");
+ };
+ rec.onresult=e=>{
+  const command=e.results[0][0].transcript.toLowerCase();
+  status("YOU SAID: "+command);
+  runCommand(command);
+ };
+ rec.start();
 }
 
-function processCommand(command){
- if(command.includes("youtube")){
-  openApp("https://www.youtube.com");
- }else if(command.includes("whatsapp")){
-  openApp("https://web.whatsapp.com");
- }else if(command.includes("instagram")){
-  openApp("https://www.instagram.com");
- }else if(command.includes("gmail")){
-  openApp("https://mail.google.com");
- }else if(command.includes("time")){
-  say("The time is "+new Date().toLocaleTimeString());
- }else if(command.includes("hello")||command.includes("hi")){
-  say("Hello Sir. JARVIS is online. How can I help you?");
- }else{
-  say("Command received. AI brain connection will be added in the next step.");
- }
+function runCommand(command){
+ if(command.includes("youtube"))open("https://youtube.com");
+ else if(command.includes("whatsapp"))open("https://whatsapp.com");
+ else if(command.includes("instagram"))open("https://instagram.com");
+ else if(command.includes("gmail"))open("https://mail.google.com");
+ else if(command.includes("search"))search();
+ else if(command.includes("time"))say("The time is "+new Date().toLocaleTimeString());
+ else if(command.includes("hello"))say("Hello Sir. JARVIS is online.");
+ else say("Command received. AI brain connection is the next step.");
 }
 
-function openApp(url){window.open(url,"_blank");}
-function showApps(){
- const choice=prompt("Type an app: WhatsApp, Instagram, YouTube, Gmail");
- if(!choice)return;
- const apps={
-  whatsapp:"https://web.whatsapp.com",
-  instagram:"https://www.instagram.com",
-  youtube:"https://www.youtube.com",
+function open(url){
+ window.open(url,"_blank");
+}
+
+function apps(){
+ const app=prompt("Enter app: WhatsApp, Instagram, YouTube, Gmail");
+ if(!app)return;
+ const links={
+  whatsapp:"https://whatsapp.com",
+  instagram:"https://instagram.com",
+  youtube:"https://youtube.com",
   gmail:"https://mail.google.com"
  };
- const url=apps[choice.toLowerCase()];
- if(url)openApp(url);
- else output.textContent="App shortcut not found.";
+ if(links[app.toLowerCase()])open(links[app.toLowerCase()]);
+ else status("App shortcut not found.");
 }
-function searchWeb(){
+
+function search(){
  const q=prompt("What should I search?");
- if(q)openApp("https://www.google.com/search?q="+encodeURIComponent(q));
+ if(q)open("https://www.google.com/search?q="+encodeURIComponent(q));
 }
-function openMedia(){openApp("https://www.youtube.com");}
-function showSettings(){
- const choice=prompt("Settings: Type 'voice' to test JARVIS voice.");
- if(choice && choice.toLowerCase()==="voice")say("JARVIS voice system is online.");
+
+function media(){open("https://youtube.com");}
+
+function settings(){
+ say("JARVIS settings selected.");
 }
 </script>
 </body>
