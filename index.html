@@ -1,191 +1,128 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JARVIS Interface</title>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
-.stage{position:relative;width:100vw;height:100vh;overflow:hidden}
-.reference{
- position:absolute;inset:0;width:100%;height:100%;
- object-fit:fill;
-}
-.hotspot{
- position:absolute;z-index:3;border:0;
- background:transparent;color:transparent;
- cursor:pointer;padding:0;
-}
-.hotspot:focus-visible{
- outline:2px solid #00eaff;
- background:#00cfff22;
-}
-#clock{
- position:absolute;z-index:4;right:3%;top:6%;
- color:#dffaff;font: bold clamp(9px,1.1vw,16px) Arial;
- text-shadow:0 0 8px #00bfff;pointer-events:none;
-}
-#status{
- position:absolute;z-index:5;left:50%;bottom:2%;
- transform:translateX(-50%);color:#00eaff;
- font:12px Arial;text-shadow:0 0 8px #00bfff;
- pointer-events:none;
-}
-#mic.active{background:#00cfff33;outline:2px solid #00eaff}
-@media (orientation:portrait){
- .stage{display:none}
- body:after{
- content:"ROTATE YOUR PHONE TO LANDSCAPE";
- position:fixed;inset:0;display:grid;place-items:center;
- color:#00eaff;font:bold 20px Arial;text-align:center;
- background:#020811;
- }
-}
-</style>
-</head>
-<body>
-<div class="stage">
-
- <img class="reference" src="jarvis-reference.png"
-      alt="JARVIS interface">
-
- <div id="clock">Loading...</div>
- <div id="status">JARVIS SYSTEM ONLINE</div>
-
- <!-- LEFT MENU -->
- <button class="hotspot" style="left:1%;top:28%;width:9%;height:14%"
- onclick="say('Home screen activated')" aria-label="Home"></button>
-
- <button class="hotspot" style="left:1%;top:43%;width:9%;height:12%"
- onclick="apps()" aria-label="Apps"></button>
-
- <button class="hotspot" style="left:1%;top:56%;width:9%;height:12%"
- onclick="say('Files panel selected')" aria-label="Files"></button>
-
- <button class="hotspot" style="left:1%;top:69%;width:9%;height:12%"
- onclick="settings()" aria-label="Settings"></button>
-
- <button class="hotspot" style="left:1%;top:82%;width:9%;height:14%"
- onclick="say('Power options selected')" aria-label="Power"></button>
-
- <!-- QUICK ACTIONS -->
- <button id="mic" class="hotspot"
- style="left:60.5%;top:69%;width:7%;height:25%"
- onclick="listen()" aria-label="Voice Assist"></button>
-
- <button class="hotspot"
- style="left:69%;top:69%;width:7%;height:25%"
- onclick="search()" aria-label="Search"></button>
-
- <button class="hotspot"
- style="left:77%;top:69%;width:7%;height:25%"
- onclick="media()" aria-label="Media"></button>
-
- <button class="hotspot"
- style="left:85%;top:69%;width:7%;height:25%"
- onclick="settings()" aria-label="Settings"></button>
-
- <button class="hotspot"
- style="left:93%;top:69%;width:6.5%;height:25%"
- onclick="apps()" aria-label="More"></button>
-
-</div>
-
 <script>
-const statusBox=document.getElementById("status");
+// ===== JARVIS V4 - British Male Voice + Voice Commands =====
 
-function status(text){
- statusBox.textContent=text;
-}
+const output = document.getElementById("output");
 
-function say(text){
- status(text);
- if("speechSynthesis" in window){
+// Speak with British Male Voice
+function say(message){
+  output.textContent = message;
+
+  if(!("speechSynthesis" in window)) return;
+
   speechSynthesis.cancel();
-  const speech=new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-GB";
-utterance.rate = 0.88;
-utterance.pitch = 0.75;
+
+  const speech = new SpeechSynthesisUtterance(message);
+  speech.lang = "en-GB";
+  speech.rate = 0.88;
+  speech.pitch = 0.75;
+  speech.volume = 1;
+
+  const voices = speechSynthesis.getVoices();
+
+  // British Male voice preference
+  const britishMale =
+    voices.find(v =>
+      v.lang.toLowerCase().startsWith("en-gb") &&
+      /male|daniel|george|ryan|arthur|oliver/i.test(v.name)
+    ) ||
+    voices.find(v => v.lang.toLowerCase().startsWith("en-gb"));
+
+  if(britishMale) speech.voice = britishMale;
+
   speechSynthesis.speak(speech);
- }
 }
 
+// Live Clock
 function updateClock(){
- const d=new Date();
- document.getElementById("clock").textContent=
- d.toLocaleDateString("en-IN",{weekday:"short",month:"short",
- day:"numeric",year:"numeric"})+"  |  "+
- d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  const clock = document.getElementById("clock");
+  if(clock){
+    clock.textContent = new Date().toLocaleTimeString("en-GB");
+  }
 }
-updateClock();
 setInterval(updateClock,1000);
+updateClock();
 
+// Voice Recognition
 function listen(){
- const Recognition=window.SpeechRecognition||
-                   window.webkitSpeechRecognition;
- if(!Recognition){
-  say("Voice recognition is not supported in this browser.");
-  return;
- }
- const mic=document.getElementById("mic");
- const rec=new Recognition();
- rec.lang="en-IN";
- rec.onstart=()=>{
-  mic.classList.add("active");
-  status("JARVIS IS LISTENING...");
- };
- rec.onend=()=>mic.classList.remove("active");
- rec.onerror=()=>{
-  status("Microphone error. Check browser permission.");
- };
- rec.onresult=e=>{
-  const command=e.results[0][0].transcript.toLowerCase();
-  status("YOU SAID: "+command);
-  runCommand(command);
- };
- rec.start();
+
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!Recognition){
+    say("Voice recognition is not supported.");
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "en-GB";
+  recognition.interimResults = false;
+  recognition.continuous = false;
+
+  output.textContent = "JARVIS LISTENING...";
+
+  recognition.onresult = (e)=>{
+    const command =
+      e.results[0][0].transcript.toLowerCase();
+
+    output.textContent = "YOU: " + command;
+    handleCommand(command);
+  };
+
+  recognition.onerror = ()=>{
+    output.textContent = "Microphone error.";
+  };
+
+  recognition.start();
 }
 
-function runCommand(command){
- if(command.includes("youtube"))open("https://youtube.com");
- else if(command.includes("whatsapp"))open("https://whatsapp.com");
- else if(command.includes("instagram"))open("https://instagram.com");
- else if(command.includes("gmail"))open("https://mail.google.com");
- else if(command.includes("search"))search();
- else if(command.includes("time"))say("The time is "+new Date().toLocaleTimeString());
- else if(command.includes("hello"))say("Hello Sir. JARVIS is online.");
- else say("Command received. AI brain connection is the next step.");
+// Voice Commands
+function handleCommand(command){
+
+  if(command.includes("hello") || command.includes("jarvis")){
+    say("Hello Sir. How may I assist you?");
+  }
+
+  else if(command.includes("time")){
+    say("The time is " + new Date().toLocaleTimeString("en-GB"));
+  }
+
+  else if(command.includes("date")){
+    say("Today is " + new Date().toLocaleDateString("en-GB"));
+  }
+
+  else if(command.includes("youtube")){
+    say("Opening YouTube.");
+    window.open("https://youtube.com","_blank");
+  }
+
+  else if(command.includes("whatsapp")){
+    say("Opening WhatsApp.");
+    window.open("https://web.whatsapp.com","_blank");
+  }
+
+  else if(command.includes("instagram")){
+    say("Opening Instagram.");
+    window.open("https://instagram.com","_blank");
+  }
+
+  else if(command.includes("gmail")){
+    say("Opening Gmail.");
+    window.open("https://mail.google.com","_blank");
+  }
+
+  else{
+    say("Command received, Sir.");
+  }
 }
 
-function open(url){
- window.open(url,"_blank");
+// App buttons
+function openSite(url){
+  window.open(url,"_blank");
 }
 
-function apps(){
- const app=prompt("Enter app: WhatsApp, Instagram, YouTube, Gmail");
- if(!app)return;
- const links={
-  whatsapp:"https://whatsapp.com",
-  instagram:"https://instagram.com",
-  youtube:"https://youtube.com",
-  gmail:"https://mail.google.com"
- };
- if(links[app.toLowerCase()])open(links[app.toLowerCase()]);
- else status("App shortcut not found.");
-}
-
-function search(){
- const q=prompt("What should I search?");
- if(q)open("https://www.google.com/search?q="+encodeURIComponent(q));
-}
-
-function media(){open("https://youtube.com");}
-
-function settings(){
- say("JARVIS settings selected.");
+// Load voices after browser is ready
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = ()=>{};
 }
 </script>
-</body>
-</html>
