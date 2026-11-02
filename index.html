@@ -6,6 +6,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JARVIS AI</title>
 
+/* JARVIS HOLOGRAM UPGRADE */
+
+.core {
+  width: 240px;
+  height: 240px;
+  position: relative;
+  border: 2px solid #00eaff;
+  background: radial-gradient(
+    circle,
+    rgba(0, 190, 255, 0.18),
+    transparent 70%
+  );
+  box-shadow:
+    0 0 25px #00d9ff,
+    inset 0 0 35px #007da0;
+}
+
+.core::before {
+  inset: 8px;
+  border: 2px dashed #00eaff;
+  animation: rotate 8s linear infinite;
+}
+
+.core::after {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border: 1px solid #008cff;
+  border-radius: 50%;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: rotateReverse 5s linear infinite;
+}
+
+.core-inner {
+  width: 105px;
+  height: 105px;
+  background: radial-gradient(
+    circle,
+    white 0%,
+    #00eaff 30%,
+    #0066ff 75%
+  );
+  box-shadow:
+    0 0 25px #00eaff,
+    0 0 60px #0077ff;
+  animation: energy 2s ease-in-out infinite;
+}
+
+@keyframes rotateReverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes energy {
+  50% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+}
+
 <style>
 * {
   margin: 0;
