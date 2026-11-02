@@ -261,7 +261,205 @@ function runCommand() {
   message.textContent = reply;
   speakText(reply);
 }
-</script>
+  
+const message = document.getElementById("message");
+
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    message.textContent = text;
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-IN";
+  speech.rate = 0.92;
+  speech.pitch = 0.9;
+
+  speechSynthesis.speak(speech);
+}
+
+function speak() {
+  speakText("Welcome back, sir. Jarvis systems are ready.");
+}
+
+function listen() {
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    message.textContent =
+      "Voice recognition is not supported in this browser.";
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "en-IN";
+
+  recognition.onstart = () => {
+    message.textContent = "Listening, sir...";
+  };
+
+  recognition.onresult = (event) => {
+    const command =
+      event.results[0][0].transcript;
+
+    document.getElementById("command").value = command;
+    runCommand();
+  };
+
+  recognition.onerror = () => {
+    message.textContent = "Voice system unavailable.";
+  };
+
+  recognition.start();
+}
+
+function runCommand() {
+  const command = document
+    .getElementById("command")
+    .value.toLowerCase().trim();
+
+  if (!command) return;
+
+  let reply;
+
+  if (command.includes("hello") ||
+      command.includes("hi jarvis")) {
+    reply = "Hello sir. How may I assist you?";
+  }
+  else if (command.includes("time")) {
+    reply = "The current time is " +
+      new Date().toLocaleTimeString();
+  }
+  else if (command.includes("date")) {
+    reply = "Today's date is " +
+      new Date().toLocaleDateString();
+  }
+  else if (command.includes("status")) {
+    reply = "All interface systems are operational.";
+  }
+  else if (command.includes("who are you")) {
+    reply = "I am Jarvis, your personal digital assistant.";
+  }
+  else if (command.includes("how are you")) {
+    reply = "I am functioning perfectly, sir.";
+  }
+  else if (command.includes("your name")) {
+    reply = "My name is Jarvis.";
+  }
+  else if (command.includes("help")) {
+    reply = "You can ask me for the time, date, status or introduce yourself.";
+  }
+  else {
+    reply = "I have received your command. My advanced AI brain is coming soon.";
+  }
+
+  message.textContent = reply;
+  speakText(reply);
+}
+
+const message = document.getElementById("message");
+
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    message.textContent = text;
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-IN";
+  speech.rate = 0.92;
+  speech.pitch = 0.9;
+
+  speechSynthesis.speak(speech);
+}
+
+function speak() {
+  speakText("Welcome back, sir. Jarvis systems are ready.");
+}
+
+function listen() {
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    message.textContent =
+      "Voice recognition is not supported in this browser.";
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "en-IN";
+
+  recognition.onstart = () => {
+    message.textContent = "Listening, sir...";
+  };
+
+  recognition.onresult = (event) => {
+    const command =
+      event.results[0][0].transcript;
+
+    document.getElementById("command").value = command;
+    runCommand();
+  };
+
+  recognition.onerror = () => {
+    message.textContent = "Voice system unavailable.";
+  };
+
+  recognition.start();
+}
+
+function runCommand() {
+  const command = document
+    .getElementById("command")
+    .value.toLowerCase().trim();
+
+  if (!command) return;
+
+  let reply;
+
+  if (command.includes("hello") ||
+      command.includes("hi jarvis")) {
+    reply = "Hello sir. How may I assist you?";
+  }
+  else if (command.includes("time")) {
+    reply = "The current time is " +
+      new Date().toLocaleTimeString();
+  }
+  else if (command.includes("date")) {
+    reply = "Today's date is " +
+      new Date().toLocaleDateString();
+  }
+  else if (command.includes("status")) {
+    reply = "All interface systems are operational.";
+  }
+  else if (command.includes("who are you")) {
+    reply = "I am Jarvis, your personal digital assistant.";
+  }
+  else if (command.includes("how are you")) {
+    reply = "I am functioning perfectly, sir.";
+  }
+  else if (command.includes("your name")) {
+    reply = "My name is Jarvis.";
+  }
+  else if (command.includes("help")) {
+    reply = "You can ask me for the time, date, status or introduce yourself.";
+  }
+  else {
+    reply = "I have received your command. My advanced AI brain is coming soon.";
+  }
+
+  message.textContent = reply;
+  speakText(reply);
+}
+
 
 </body>
 </html>
