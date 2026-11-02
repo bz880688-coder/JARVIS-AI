@@ -1,128 +1,413 @@
-<script>
-// ===== JARVIS V4 - British Male Voice + Voice Commands =====
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #020812;
+  color: #00d9ff;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app {
+  width: 100%;
+  max-width: 500px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 18px;
+  background:
+    radial-gradient(ellipse at center, #08213a 0%, #020812 75%);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #087eae;
+  padding-bottom: 15px;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-shadow: 0 0 12px #00d9ff;
+}
+
+.status {
+  font-size: 10px;
+  color: #00ff9d;
+}
+
+.clock {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 15px;
+  color: #8beaff;
+}
+
+h2 {
+  text-align: center;
+  font-size: 15px;
+  letter-spacing: 4px;
+  margin-top: 22px;
+  color: #b4f3ff;
+}
+
+.core-area {
+  height: 290px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.core {
+  width: 220px;
+  height: 220px;
+  border: 2px solid #00d9ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 20px #00aaff,
+              inset 0 0 25px #006caa;
+  animation: pulse 3s infinite;
+}
+
+.core::before,
+.core::after {
+  content: "";
+  position: absolute;
+  border: 2px dashed #00aaff;
+  border-radius: 50%;
+  inset: 12px;
+  animation: rotate 12s linear infinite;
+}
+
+.core::after {
+  inset: -12px;
+  border-style: solid;
+  border-color: transparent #00d9ff transparent #00d9ff;
+  animation-direction: reverse;
+}
+
+.inner {
+  width: 115px;
+  height: 115px;
+  border: 3px solid #5beaff;
+  border-radius: 50%;
+  background: radial-gradient(circle, #19caff, #07518b 55%, #020812);
+  box-shadow: 0 0 35px #00bfff;
+}
+
+@keyframes rotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  50% { transform: scale(1.04); }
+}
+
+.panel {
+  border: 1px solid #087eae;
+  border-radius: 12px;
+  background: rgba(0, 40, 70, .35);
+  padding: 15px;
+  margin-bottom: 14px;
+  box-shadow: 0 0 12px #003b60;
+}
+
+.panel-title {
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.output {
+  min-height: 45px;
+  color: #c5f7ff;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+button {
+  background: #062b45;
+  border: 1px solid #00cfff;
+  border-radius: 9px;
+  color: #9beeff;
+  padding: 13px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #004e72;
+}
+
+button:active {
+  background: #007ca8;
+}
+
+.mic {
+  display: block;
+  width: 100%;
+  padding: 17px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  margin: 12px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.grid button {
+  min-height: 55px;
+}
+
+.value {
+  color: #00ffbd;
+  font-size: 19px;
+  margin-top: 6px;
+}
+
+footer {
+  text-align: center;
+  font-size: 10px;
+  color: #458da9;
+  padding: 15px 0;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">J.A.R.V.I.S</div>
+  <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<div class="clock" id="clock">00:00:00</div>
+
+<h2>ARTIFICIAL INTELLIGENCE</h2>
+
+<div class="core-area">
+  <div class="core">
+    <div class="inner"></div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">JARVIS RESPONSE</div>
+  <div class="output" id="output">
+    Good evening, Sir. JARVIS systems are ready.
+  </div>
+</div>
+
+<button class="mic" onclick="listen()">
+  🎙 ACTIVATE VOICE ASSISTANT
+</button>
+
+<div class="panel">
+  <div class="panel-title">SYSTEM MONITOR</div>
+  <div class="grid">
+    <div>
+      <div>CPU</div>
+      <div class="value">ONLINE</div>
+    </div>
+    <div>
+      <div>MEMORY</div>
+      <div class="value">READY</div>
+    </div>
+    <div>
+      <div>NETWORK</div>
+      <div class="value">CONNECTED</div>
+    </div>
+    <div>
+      <div>AI CORE</div>
+      <div class="value">ACTIVE</div>
+    </div>
+  </div>
+  <p style="font-size:10px;color:#649eb8;margin-top:12px">
+    Demo status indicators — not actual hardware readings.
+  </p>
+</div>
+
+<div class="panel">
+  <div class="panel-title">QUICK APPLICATIONS</div>
+  <div class="grid">
+    <button onclick="openSite('https://youtube.com')">▶ YouTube</button>
+    <button onclick="openSite('https://instagram.com')">◎ Instagram</button>
+    <button onclick="openSite('https://web.whatsapp.com')">WhatsApp</button>
+    <button onclick="openSite('https://mail.google.com')">Gmail</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">SYSTEM CONTROL</div>
+  <div class="grid">
+    <button onclick="say('All systems are operational.')">SYSTEM CHECK</button>
+    <button onclick="say('I am listening, Sir.')">VOICE TEST</button>
+  </div>
+</div>
+
+<footer>JARVIS AI • PORTRAIT INTERFACE • V5.0</footer>
+
+</div>
+
+<script>
 const output = document.getElementById("output");
 
-// Speak with British Male Voice
-function say(message){
+function say(message) {
   output.textContent = message;
 
-  if(!("speechSynthesis" in window)) return;
+  if (!("speechSynthesis" in window)) {
+    output.textContent += " Voice is not supported.";
+    return;
+  }
 
   speechSynthesis.cancel();
 
   const speech = new SpeechSynthesisUtterance(message);
   speech.lang = "en-GB";
   speech.rate = 0.88;
-  speech.pitch = 0.75;
+  speech.pitch = 0.85;
   speech.volume = 1;
 
   const voices = speechSynthesis.getVoices();
 
-  // British Male voice preference
-  const britishMale =
-    voices.find(v =>
-      v.lang.toLowerCase().startsWith("en-gb") &&
-      /male|daniel|george|ryan|arthur|oliver/i.test(v.name)
-    ) ||
-    voices.find(v => v.lang.toLowerCase().startsWith("en-gb"));
+  const britishMale = voices.find(v =>
+    v.lang.toLowerCase().startsWith("en-gb") &&
+    /daniel|george|ryan|arthur|oliver/i.test(v.name)
+  );
 
-  if(britishMale) speech.voice = britishMale;
+  const britishVoice = voices.find(v =>
+    v.lang.toLowerCase().startsWith("en-gb")
+  );
+
+  speech.voice = britishMale || britishVoice || null;
 
   speechSynthesis.speak(speech);
 }
 
-// Live Clock
-function updateClock(){
-  const clock = document.getElementById("clock");
-  if(clock){
-    clock.textContent = new Date().toLocaleTimeString("en-GB");
-  }
+function updateClock() {
+  document.getElementById("clock").textContent =
+    new Date().toLocaleTimeString("en-GB");
 }
-setInterval(updateClock,1000);
+
+setInterval(updateClock, 1000);
 updateClock();
 
-// Voice Recognition
-function listen(){
-
+function listen() {
   const Recognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-  if(!Recognition){
-    say("Voice recognition is not supported.");
+  if (!Recognition) {
+    say("Voice recognition is not supported in this browser.");
     return;
   }
 
   const recognition = new Recognition();
   recognition.lang = "en-GB";
-  recognition.interimResults = false;
   recognition.continuous = false;
+  recognition.interimResults = false;
 
   output.textContent = "JARVIS LISTENING...";
 
-  recognition.onresult = (e)=>{
+  recognition.onresult = function(event) {
     const command =
-      e.results[0][0].transcript.toLowerCase();
+      event.results[0][0].transcript.toLowerCase();
 
     output.textContent = "YOU: " + command;
     handleCommand(command);
   };
 
-  recognition.onerror = ()=>{
-    output.textContent = "Microphone error.";
+  recognition.onerror = function() {
+    output.textContent =
+      "Microphone error. Please check microphone permission.";
   };
 
-  recognition.start();
+  recognition.onend = function() {
+    console.log("Voice session ended.");
+  };
+
+  try {
+    recognition.start();
+  } catch(error) {
+    output.textContent = "Please try the microphone again.";
+  }
 }
 
-// Voice Commands
-function handleCommand(command){
+function handleCommand(command) {
 
-  if(command.includes("hello") || command.includes("jarvis")){
+  if (command.includes("hello") ||
+      command.includes("jarvis")) {
     say("Hello Sir. How may I assist you?");
   }
 
-  else if(command.includes("time")){
-    say("The time is " + new Date().toLocaleTimeString("en-GB"));
+  else if (command.includes("time")) {
+    say("The time is " +
+      new Date().toLocaleTimeString("en-GB"));
   }
 
-  else if(command.includes("date")){
-    say("Today is " + new Date().toLocaleDateString("en-GB"));
+  else if (command.includes("date")) {
+    say("Today is " +
+      new Date().toLocaleDateString("en-GB"));
   }
 
-  else if(command.includes("youtube")){
+  else if (command.includes("youtube")) {
     say("Opening YouTube.");
-    window.open("https://youtube.com","_blank");
+    openSite("https://youtube.com");
   }
 
-  else if(command.includes("whatsapp")){
+  else if (command.includes("whatsapp")) {
     say("Opening WhatsApp.");
-    window.open("https://web.whatsapp.com","_blank");
+    openSite("https://web.whatsapp.com");
   }
 
-  else if(command.includes("instagram")){
+  else if (command.includes("instagram")) {
     say("Opening Instagram.");
-    window.open("https://instagram.com","_blank");
+    openSite("https://instagram.com");
   }
 
-  else if(command.includes("gmail")){
+  else if (command.includes("gmail")) {
     say("Opening Gmail.");
-    window.open("https://mail.google.com","_blank");
+    openSite("https://mail.google.com");
   }
 
-  else{
-    say("Command received, Sir.");
+  else {
+    say("Command received, Sir. I am ready for your next instruction.");
   }
 }
 
-// App buttons
-function openSite(url){
-  window.open(url,"_blank");
+function openSite(url) {
+  window.open(url, "_blank");
 }
 
-// Load voices after browser is ready
-if("speechSynthesis" in window){
-  speechSynthesis.onvoiceschanged = ()=>{};
+if ("speechSynthesis" in window) {
+  speechSynthesis.onvoiceschanged = function() {
+    speechSynthesis.getVoices();
+  };
 }
+
+say("JARVIS online. Good evening, Sir.");
 </script>
+
+</body>
+</html>
